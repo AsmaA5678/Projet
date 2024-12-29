@@ -1,0 +1,30 @@
+services:
+  registry:
+    image: registry:2
+    container_name: local-registry
+    ports:
+      - "7000:5000"
+    restart: always
+    environment:
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin: "['http://localhost:8002']"
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Credentials: "[true]"
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers: "['Authorization', 'Accept']"
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods: "['HEAD', 'GET', 'OPTIONS']"
+    volumes:
+      - registry-data:/var/lib/registry
+  registry-ui:
+    image: joxit/docker-registry-ui:latest
+    container_name: local-registry-ui
+    ports:
+      - "8002:80"
+    restart: always
+    environment:
+      - REGISTRY_TITLE=Local Docker Registry
+      - REGISTRY_URL=http://localhost:7000
+      - DELETE_IMAGES=true
+    depends_on:
+      - registry
+volumes:
+  registry-data:
+    driver: local

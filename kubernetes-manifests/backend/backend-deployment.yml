@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: exam
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: asmaamestaoui/student-grades-backend:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "512Mi"    
+              cpu: "500m"       
+            limits:
+              memory: "1Gi"     
+              cpu: "1"      
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/gestion_etudiants 
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+                 
+---
